@@ -1,17 +1,29 @@
-# Use an Ubuntu base image
-FROM ubuntu:22.04
+#
+# Copyright © 2025 pyjamabrah.com. All Rights Reserved.
+# Author: Piyush Itankar <piyush@pyjamabrah.com>
+#
 
-# Install required dependencies
-RUN apt update && apt install -y \
-    gcc-arm-none-eabi \
-    binutils-arm-none-eabi \
-    gdb-multiarch \
-    make \
-    cmake \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu
 
-# Set default working directory
-WORKDIR /workspace
+ENV DEBIAN_FRONTEND=noninteractive
 
-CMD ["/bin/bash"]
+RUN sudo apt-get update
+RUN sudo apt-get install --no-install-recommends -y \
+  sudo \
+  binutils-common \
+  make \
+  git-core \
+  wget \
+  tree \
+  build-essential \
+  python3 \
+  python3-dev \
+  python3-pip \
+  binutils \
+  make \
+  qemu-system-arm \
+  gcc-arm-none-eabi \
+  gdb-multiarch
+
+# terminal colors with xterm
+ENV TERM xterm

@@ -11,5 +11,5 @@
             ]
         }
     },
-    "postCreateCommand": "arm-none-eabi-gcc --version"
+    "postCreateCommand": "pip install pygments && wget -P ~ https://github.com/cyrus-and/gdb-dashboard/raw/master/.gdbinit"
 }

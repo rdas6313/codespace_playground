@@ -21,8 +21,11 @@ SECTIONS
         . = ALIGN(4);
         _sdata = .;
         *(.data)
+        *(.stack*)
         _edata = .;
     } > RAM AT > FLASH
+
+    
 
     _stack_top = ORIGIN(RAM) + LENGTH(RAM);
 

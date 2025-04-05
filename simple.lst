@@ -1,0 +1,281 @@
+
+simple.elf:     file format elf32-littlearm
+simple.elf
+architecture: armv7, flags 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+start address 0x00000000
+
+Program Header:
+    LOAD off    0x00010000 vaddr 0x00000000 paddr 0x00000000 align 2**16
+         filesz 0x0000024c memsz 0x0000024c flags r-x
+    LOAD off    0x00020000 vaddr 0x20000000 paddr 0x0000024c align 2**16
+         filesz 0x00000090 memsz 0x00000090 flags rw-
+private flags = 0x5000200: [Version5 EABI] [soft-float ABI]
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000024c  00000000  00000000  00010000  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000090  20000000  0000024c  00020000  2**4
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .ARM.attributes 00000021  00000000  00000000  00020090  2**0
+                  CONTENTS, READONLY
+  3 .debug_line   00000074  00000000  00000000  000200b1  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  4 .debug_info   00000026  00000000  00000000  00020125  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  5 .debug_abbrev 00000014  00000000  00000000  0002014b  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  6 .debug_aranges 00000020  00000000  00000000  00020160  2**3
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+  7 .debug_str    00000036  00000000  00000000  00020180  2**0
+                  CONTENTS, READONLY, DEBUGGING, OCTETS
+SYMBOL TABLE:
+00000000 l    d  .text	00000000 .text
+20000000 l    d  .data	00000000 .data
+00000000 l    d  .ARM.attributes	00000000 .ARM.attributes
+00000000 l    d  .debug_line	00000000 .debug_line
+00000000 l    d  .debug_info	00000000 .debug_info
+00000000 l    d  .debug_abbrev	00000000 .debug_abbrev
+00000000 l    d  .debug_aranges	00000000 .debug_aranges
+00000000 l    d  .debug_str	00000000 .debug_str
+00000000 l    df *ABS*	00000000 simple.o
+e000e010 l       *ABS*	00000000 CSR
+e000e014 l       *ABS*	00000000 RVR
+e000e018 l       *ABS*	00000000 CVR
+000fffff l       *ABS*	00000000 timeout
+00000000 l       .text	00000000 vector_table
+000001d0 l     F .text	00000000 reset_handler
+000001f6 l     F .text	00000000 systick_handler
+20000000 l       .data	00000000 array
+20000010 l       .data	00000000 stack1
+20000050 l       .data	00000000 stack2
+000001d6 l       .text	00000000 loop
+00000214 l       .text	00000000 switch
+00000222 l     F .text	00000000 task1
+00000228 l     F .text	00000000 task2
+0000024c g       .text	00000000 _etext
+20000000 g       .data	00000000 _sdata
+20001000 g       .data	00000000 _stack_top
+20000090 g       .data	00000000 _edata
+
+
+
+Disassembly of section .text:
+
+00000000 <vector_table>:
+   0:	20001000 	andcs	r1, r0, r0
+   4:	000001d1 	ldrdeq	r0, [r0], -r1
+	...
+  3c:	000001f7 	strdeq	r0, [r0], -r7
+	...
+
+000001d0 <reset_handler>:
+ 1d0:	4816      	ldr	r0, [pc, #88]	; (22c <task2+0x4>)
+ 1d2:	4917      	ldr	r1, [pc, #92]	; (230 <task2+0x8>)
+ 1d4:	4d17      	ldr	r5, [pc, #92]	; (234 <task2+0xc>)
+
+000001d6 <loop>:
+ 1d6:	6802      	ldr	r2, [r0, #0]
+ 1d8:	600a      	str	r2, [r1, #0]
+ 1da:	3004      	adds	r0, #4
+ 1dc:	3104      	adds	r1, #4
+ 1de:	428d      	cmp	r5, r1
+ 1e0:	dcf9      	bgt.n	1d6 <loop>
+ 1e2:	4815      	ldr	r0, [pc, #84]	; (238 <task2+0x10>)
+ 1e4:	4a15      	ldr	r2, [pc, #84]	; (23c <task2+0x14>)
+ 1e6:	6002      	str	r2, [r0, #0]
+ 1e8:	4815      	ldr	r0, [pc, #84]	; (240 <task2+0x18>)
+ 1ea:	2200      	movs	r2, #0
+ 1ec:	6002      	str	r2, [r0, #0]
+ 1ee:	4815      	ldr	r0, [pc, #84]	; (244 <task2+0x1c>)
+ 1f0:	2207      	movs	r2, #7
+ 1f2:	6002      	str	r2, [r0, #0]
+ 1f4:	e7fe      	b.n	1f4 <loop+0x1e>
+
+000001f6 <systick_handler>:
+ 1f6:	b4f0      	push	{r4, r5, r6, r7}
+ 1f8:	4644      	mov	r4, r8
+ 1fa:	464d      	mov	r5, r9
+ 1fc:	4656      	mov	r6, sl
+ 1fe:	465f      	mov	r7, fp
+ 200:	b4f0      	push	{r4, r5, r6, r7}
+ 202:	4811      	ldr	r0, [pc, #68]	; (248 <task2+0x20>)
+ 204:	6881      	ldr	r1, [r0, #8]
+ 206:	0089      	lsls	r1, r1, #2
+ 208:	5845      	ldr	r5, [r0, r1]
+ 20a:	46ad      	mov	sp, r5
+ 20c:	0889      	lsrs	r1, r1, #2
+ 20e:	2601      	movs	r6, #1
+ 210:	4071      	eors	r1, r6
+ 212:	6081      	str	r1, [r0, #8]
+
+00000214 <switch>:
+ 214:	bcf0      	pop	{r4, r5, r6, r7}
+ 216:	46a0      	mov	r8, r4
+ 218:	46a9      	mov	r9, r5
+ 21a:	46b2      	mov	sl, r6
+ 21c:	46bb      	mov	fp, r7
+ 21e:	bcf0      	pop	{r4, r5, r6, r7}
+ 220:	4770      	bx	lr
+
+00000222 <task1>:
+ 222:	46c0      	nop			; (mov r8, r8)
+ 224:	3001      	adds	r0, #1
+ 226:	e7fc      	b.n	222 <task1>
+
+00000228 <task2>:
+ 228:	3101      	adds	r1, #1
+ 22a:	e7fd      	b.n	228 <task2>
+ 22c:	0000024c 	andeq	r0, r0, ip, asr #4
+ 230:	20000000 	andcs	r0, r0, r0
+ 234:	20000090 	mulcs	r0, r0, r0
+ 238:	e000e014 	and	lr, r0, r4, lsl r0
+ 23c:	000fffff 	strdeq	pc, [pc], -pc	; <UNPREDICTABLE>
+ 240:	e000e018 	and	lr, r0, r8, lsl r0
+ 244:	e000e010 	and	lr, r0, r0, lsl r0
+ 248:	20000000 	andcs	r0, r0, r0
+
+Disassembly of section .data:
+
+20000000 <_sdata>:
+20000000:	20000010 	andcs	r0, r0, r0, lsl r0
+20000004:	20000050 	andcs	r0, r0, r0, asr r0
+	...
+
+20000010 <stack1>:
+20000010:	00000018 	andeq	r0, r0, r8, lsl r0
+20000014:	00000019 	andeq	r0, r0, r9, lsl r0
+20000018:	0000001a 	andeq	r0, r0, sl, lsl r0
+2000001c:	0000001b 	andeq	r0, r0, fp, lsl r0
+20000020:	00000014 	andeq	r0, r0, r4, lsl r0
+20000024:	00000015 	andeq	r0, r0, r5, lsl r0
+20000028:	00000016 	andeq	r0, r0, r6, lsl r0
+2000002c:	00000017 	andeq	r0, r0, r7, lsl r0
+20000030:	00000010 	andeq	r0, r0, r0, lsl r0
+20000034:	00000011 	andeq	r0, r0, r1, lsl r0
+20000038:	00000012 	andeq	r0, r0, r2, lsl r0
+2000003c:	00000013 	andeq	r0, r0, r3, lsl r0
+20000040:	0000001c 	andeq	r0, r0, ip, lsl r0
+20000044:	fffffffd 			; <UNDEFINED> instruction: 0xfffffffd
+20000048:	00000223 	andeq	r0, r0, r3, lsr #4
+2000004c:	01000000 	mrseq	r0, (UNDEF: 0)
+
+20000050 <stack2>:
+20000050:	0000002b 	andeq	r0, r0, fp, lsr #32
+20000054:	0000002a 	andeq	r0, r0, sl, lsr #32
+20000058:	00000029 	andeq	r0, r0, r9, lsr #32
+2000005c:	00000028 	andeq	r0, r0, r8, lsr #32
+20000060:	00000027 	andeq	r0, r0, r7, lsr #32
+20000064:	00000026 	andeq	r0, r0, r6, lsr #32
+20000068:	00000025 	andeq	r0, r0, r5, lsr #32
+2000006c:	00000024 	andeq	r0, r0, r4, lsr #32
+20000070:	00000020 	andeq	r0, r0, r0, lsr #32
+20000074:	00000021 	andeq	r0, r0, r1, lsr #32
+20000078:	00000022 	andeq	r0, r0, r2, lsr #32
+2000007c:	00000023 	andeq	r0, r0, r3, lsr #32
+20000080:	0000002c 	andeq	r0, r0, ip, lsr #32
+20000084:	fffffffd 			; <UNDEFINED> instruction: 0xfffffffd
+20000088:	00000229 	andeq	r0, r0, r9, lsr #4
+2000008c:	01000000 	mrseq	r0, (UNDEF: 0)
+
+Disassembly of section .ARM.attributes:
+
+00000000 <.ARM.attributes>:
+   0:	00002041 	andeq	r2, r0, r1, asr #32
+   4:	61656100 	cmnvs	r5, r0, lsl #2
+   8:	01006962 	tsteq	r0, r2, ror #18
+   c:	00000016 	andeq	r0, r0, r6, lsl r0
+  10:	726f4305 	rsbvc	r4, pc, #335544320	; 0x14000000
+  14:	2d786574 	cfldr64cs	mvdx6, [r8, #-464]!	; 0xfffffe30
+  18:	0600334d 	streq	r3, [r0], -sp, asr #6
+  1c:	094d070a 	stmdbeq	sp, {r1, r3, r8, r9, sl}^
+  20:	Address 0x0000000000000020 is out of bounds.
+
+
+Disassembly of section .debug_line:
+
+00000000 <.debug_line>:
+   0:	00000070 	andeq	r0, r0, r0, ror r0
+   4:	001f0003 	andseq	r0, pc, r3
+   8:	01020000 	mrseq	r0, (UNDEF: 2)
+   c:	000d0efb 	strdeq	r0, [sp], -fp
+  10:	01010101 	tsteq	r1, r1, lsl #2
+  14:	01000000 	mrseq	r0, (UNDEF: 0)
+  18:	00010000 	andeq	r0, r1, r0
+  1c:	706d6973 	rsbvc	r6, sp, r3, ror r9
+  20:	732e656c 			; <UNDEFINED> instruction: 0x732e656c
+  24:	00000000 	andeq	r0, r0, r0
+  28:	02050000 	andeq	r0, r5, #0
+  2c:	000001d0 	ldrdeq	r0, [r0], -r0	; <UNPREDICTABLE>
+  30:	21011603 	tstcs	r1, r3, lsl #12
+  34:	21212221 			; <UNDEFINED> instruction: 0x21212221
+  38:	25212121 	strcs	r2, [r1, #-289]!	; 0xfffffedf
+  3c:	21222121 			; <UNDEFINED> instruction: 0x21222121
+  40:	21212221 			; <UNDEFINED> instruction: 0x21212221
+  44:	21212622 			; <UNDEFINED> instruction: 0x21212622
+  48:	23212121 			; <UNDEFINED> instruction: 0x23212121
+  4c:	21212121 			; <UNDEFINED> instruction: 0x21212121
+  50:	21212121 			; <UNDEFINED> instruction: 0x21212121
+  54:	21212124 			; <UNDEFINED> instruction: 0x21212124
+  58:	28212121 	stmdacs	r1!, {r0, r5, r8, sp}
+  5c:	21252121 			; <UNDEFINED> instruction: 0x21252121
+  60:	207fb603 	rsbscs	fp, pc, r3, lsl #12
+  64:	0c032f2f 	stceq	15, cr2, [r3], {47}	; 0x2f
+  68:	32312f2e 	eorscc	r2, r1, #46, 30	; 0xb8
+  6c:	022e1203 	eoreq	r1, lr, #805306368	; 0x30000000
+  70:	01010002 	tsteq	r1, r2
+
+Disassembly of section .debug_info:
+
+00000000 <.debug_info>:
+   0:	00000022 	andeq	r0, r0, r2, lsr #32
+   4:	00000002 	andeq	r0, r0, r2
+   8:	01040000 	mrseq	r0, (UNDEF: 4)
+   c:	00000000 	andeq	r0, r0, r0
+  10:	000001d0 	ldrdeq	r0, [r0], -r0	; <UNPREDICTABLE>
+  14:	0000024c 	andeq	r0, r0, ip, asr #4
+  18:	00000000 	andeq	r0, r0, r0
+  1c:	00000009 	andeq	r0, r0, r9
+  20:	0000002a 	andeq	r0, r0, sl, lsr #32
+  24:	Address 0x0000000000000024 is out of bounds.
+
+
+Disassembly of section .debug_abbrev:
+
+00000000 <.debug_abbrev>:
+   0:	10001101 	andne	r1, r0, r1, lsl #2
+   4:	12011106 	andne	r1, r1, #-2147483647	; 0x80000001
+   8:	1b0e0301 	blne	380c14 <timeout+0x280c15>
+   c:	130e250e 	movwne	r2, #58638	; 0xe50e
+  10:	00000005 	andeq	r0, r0, r5
+
+Disassembly of section .debug_aranges:
+
+00000000 <.debug_aranges>:
+   0:	0000001c 	andeq	r0, r0, ip, lsl r0
+   4:	00000002 	andeq	r0, r0, r2
+   8:	00040000 	andeq	r0, r4, r0
+   c:	00000000 	andeq	r0, r0, r0
+  10:	000001d0 	ldrdeq	r0, [r0], -r0	; <UNPREDICTABLE>
+  14:	0000007c 	andeq	r0, r0, ip, ror r0
+	...
+
+Disassembly of section .debug_str:
+
+00000000 <.debug_str>:
+   0:	706d6973 	rsbvc	r6, sp, r3, ror r9
+   4:	732e656c 			; <UNDEFINED> instruction: 0x732e656c
+   8:	6f772f00 	svcvs	0x00772f00
+   c:	70736b72 	rsbsvc	r6, r3, r2, ror fp
+  10:	73656361 	cmnvc	r5, #-2080374783	; 0x84000001
+  14:	646f632f 	strbtvs	r6, [pc], #-815	; 1c <vector_table+0x1c>
+  18:	61707365 	cmnvs	r0, r5, ror #6
+  1c:	705f6563 	subsvc	r6, pc, r3, ror #10
+  20:	6779616c 	ldrbvs	r6, [r9, -ip, ror #2]!
+  24:	6e756f72 	mrcvs	15, 3, r6, cr5, cr2, {3}
+  28:	4e470064 	cdpmi	0, 4, cr0, cr7, cr4, {3}
+  2c:	53412055 	movtpl	r2, #4181	; 0x1055
+  30:	332e3220 			; <UNDEFINED> instruction: 0x332e3220
+  34:	Address 0x0000000000000034 is out of bounds.
+
